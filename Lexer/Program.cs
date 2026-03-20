@@ -14,7 +14,11 @@ class Program
   }";
 
     static void Main()
-    {
+    {   
+        Console.WriteLine("Lexing sample code...");
+        Console.WriteLine("--------------------------------");
+        Console.WriteLine(sampleCode);
+        Console.WriteLine("--------------------------------");
         Lexer lexer = new Lexer(sampleCode);
         foreach (Token token in lexer.Tokenize())
         {
