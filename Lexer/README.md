@@ -22,7 +22,7 @@ The `Tokenize` method walks the input while the current index is still inside th
 
 ## 4. File overview
 
-`Lexer.csproj` sets up the project as a .NET 8 console app. `TokenType.cs` lists every kind of token as an enum. `Token.cs` holds one token’s type, text, position in the file, line, and column, and formats a short string for printing. `Lexer.cs` holds the scanning logic, the keyword and operator tables, and the helper methods that read numbers, words, and symbols. `Program.cs` stores a small sample program and prints every token the lexer produces.
+`Lexer.csproj` sets up the project as a .NET 10 console app. `TokenType.cs` lists every kind of token as an enum. `Token.cs` holds one token’s type, text, position in the file, line, and column, and formats a short string for printing. `Lexer.cs` holds the scanning logic, the keyword and operator tables, and the helper methods that read numbers, words, and symbols. `Program.cs` stores a small sample program and prints every token the lexer produces.
 
 ## 5. How to run
 
