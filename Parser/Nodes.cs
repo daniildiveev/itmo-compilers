@@ -145,3 +145,39 @@ public class ExpressionStatement : Statement
         Expression = expression;
     }
 }
+
+public class FunctionDeclaration : Statement
+{
+    public string Name { get; }
+    public List<string> Parameters { get; }
+    public BlockStatement Body { get; }
+
+    public FunctionDeclaration(string name, List<string> parameters, BlockStatement body)
+    {
+        Name = name;
+        Parameters = parameters;
+        Body = body;
+    }
+}
+
+public class ReturnStatement : Statement
+{
+    public Expression? Value { get; }
+
+    public ReturnStatement(Expression? value)
+    {
+        Value = value;
+    }
+}
+
+public class CallExpression : Expression
+{
+    public string Callee { get; }
+    public List<Expression> Arguments { get; }
+
+    public CallExpression(string callee, List<Expression> arguments)
+    {
+        Callee = callee;
+        Arguments = arguments;
+    }
+}

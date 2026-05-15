@@ -11,7 +11,8 @@ public class Lexer
     private static readonly Dictionary<string, TokenType> Keywords = new Dictionary<string, TokenType>
     {
         { "var", TokenType.VAR }, { "print", TokenType.PRINT }, { "if", TokenType.IF },
-        { "else", TokenType.ELSE }, { "while", TokenType.WHILE }
+        { "else", TokenType.ELSE }, { "while", TokenType.WHILE },
+        { "fun", TokenType.FUN }, { "return", TokenType.RETURN }
     };
     private static readonly Dictionary<string, TokenType> Operators = new Dictionary<string, TokenType>
     {
@@ -19,7 +20,7 @@ public class Lexer
         { "&&", TokenType.AND }, { "||", TokenType.OR }, { "+", TokenType.PLUS }, { "-", TokenType.MINUS },
         { "*", TokenType.STAR }, { "/", TokenType.SLASH }, { "=", TokenType.EQ }, { "<", TokenType.LT },
         { ">", TokenType.GT }, { "!", TokenType.EXCL }, { "(", TokenType.LPAREN }, { ")", TokenType.RPAREN },
-        { "{", TokenType.LBRACE }, { "}", TokenType.RBRACE }, { ";", TokenType.SEMICOLON }
+        { "{", TokenType.LBRACE }, { "}", TokenType.RBRACE }, { ",", TokenType.COMMA }, { ";", TokenType.SEMICOLON }
     };
 
     public Lexer(string input)

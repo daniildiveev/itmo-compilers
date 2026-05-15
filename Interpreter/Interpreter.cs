@@ -3,9 +3,32 @@ using SimpleParser;
 
 namespace SimpleInterpreter;
 
+public class FunctionValue
+{
+    public string Name { get; }
+    public List<string> Parameters { get; }
+    public BlockStatement Body { get; }
+    public Environment Closure { get; }
+
+    public FunctionValue(string name, List<string> parameters, BlockStatement body, Environment closure)
+    {
+        Name = name;
+        Parameters = parameters;
+        Body = body;
+        Closure = closure;
+    }
+}
+
+public class ReturnException : Exception
+{
+    public object Value { get; }
+    public ReturnException(object value) { Value = value; }
+}
+
 public class Interpreter
 {
     private Environment _env = new Environment(null);
+    private Dictionary<string, FunctionValue> _functions = new Dictionary<string, FunctionValue>();
 
     public void Interpret(List<Statement> statements)
     {
@@ -104,6 +127,20 @@ public class Interpreter
             ExpressionStatement es = (ExpressionStatement)stmt;
             Eval(es.Expression);
             return;
+        }
+        if (stmt.GetType() == typeof(FunctionDeclaration))
+        {
+            FunctionDeclaration fd = (FunctionDeclaration)stmt;
+            _functions[fd.Name] = new FunctionValue(fd.Name, fd.Parameters, fd.Body, _env);
+            return;
+        }
+        if (stmt.GetType() == typeof(ReturnStatement))
+        {
+            ReturnStatement rs = (ReturnStatement)stmt;
+            object value = 0.0;
+            if (rs.Value != null)
+                value = Eval(rs.Value);
+            throw new ReturnException(value);
         }
         throw new Exception("[Runtime Error] Unknown statement type");
     }
@@ -269,6 +306,38 @@ public class Interpreter
                 return l || r;
             }
             throw new Exception("[Runtime Error] Unknown binary operator");
+        }
+        if (expr.GetType() == typeof(CallExpression))
+        {
+            CallExpression ce = (CallExpression)expr;
+            if (!_functions.ContainsKey(ce.Callee))
+                throw new Exception("[Runtime Error] Undefined function '" + ce.Callee + "'");
+            FunctionValue fn = _functions[ce.Callee];
+            if (fn.Parameters.Count != ce.Arguments.Count)
+                throw new Exception("[Runtime Error] Function '" + ce.Callee + "' expects " + fn.Parameters.Count + " arguments, got " + ce.Arguments.Count);
+            List<object> args = new List<object>();
+            for (int i = 0; i < ce.Arguments.Count; i++)
+                args.Add(Eval(ce.Arguments[i]));
+            Environment callEnv = new Environment(fn.Closure);
+            for (int i = 0; i < fn.Parameters.Count; i++)
+                callEnv.Define(fn.Parameters[i], args[i]);
+            Environment oldEnv = _env;
+            _env = callEnv;
+            object result = 0.0;
+            try
+            {
+                for (int i = 0; i < fn.Body.Statements.Count; i++)
+                    Exec(fn.Body.Statements[i]);
+            }
+            catch (ReturnException re)
+            {
+                result = re.Value;
+            }
+            finally
+            {
+                _env = oldEnv;
+            }
+            return result;
         }
         throw new Exception("[Runtime Error] Unknown expression type");
     }

@@ -8,6 +8,7 @@ public class Analyzer
     private List<Statement> _statements;
     private SymbolTable _table;
     private List<SemanticError> _errors;
+    private int _functionDepth;
 
     public Analyzer(List<Statement> statements)
     {
@@ -19,10 +20,28 @@ public class Analyzer
     public List<SemanticError> Analyze()
     {
         _table.EnterScope();
+        HoistFunctions(_statements);
         for (int i = 0; i < _statements.Count; i++)
             AnalyzeStatement(_statements[i]);
         _table.ExitScope();
         return _errors;
+    }
+
+    private void HoistFunctions(List<Statement> statements)
+    {
+        for (int i = 0; i < statements.Count; i++)
+        {
+            if (statements[i].GetType() == typeof(FunctionDeclaration))
+            {
+                FunctionDeclaration f = (FunctionDeclaration)statements[i];
+                if (_table.IsFunctionDeclared(f.Name))
+                {
+                    _errors.Add(new SemanticError("Function '" + f.Name + "' is already declared"));
+                    continue;
+                }
+                _table.DeclareFunction(f.Name, f.Parameters.Count);
+            }
+        }
     }
 
     private void AnalyzeStatement(Statement stmt)
@@ -75,6 +94,32 @@ public class Analyzer
             ExpressionStatement s = (ExpressionStatement)stmt;
             AnalyzeExpression(s.Expression);
         }
+        else if (stmt.GetType() == typeof(FunctionDeclaration))
+        {
+            FunctionDeclaration s = (FunctionDeclaration)stmt;
+            HashSet<string> seen = new HashSet<string>();
+            for (int i = 0; i < s.Parameters.Count; i++)
+            {
+                if (!seen.Add(s.Parameters[i]))
+                    _errors.Add(new SemanticError("Duplicate parameter '" + s.Parameters[i] + "' in function '" + s.Name + "'"));
+            }
+            _table.EnterScope();
+            for (int i = 0; i < s.Parameters.Count; i++)
+                _table.Declare(s.Parameters[i]);
+            _functionDepth++;
+            for (int i = 0; i < s.Body.Statements.Count; i++)
+                AnalyzeStatement(s.Body.Statements[i]);
+            _functionDepth--;
+            _table.ExitScope();
+        }
+        else if (stmt.GetType() == typeof(ReturnStatement))
+        {
+            ReturnStatement s = (ReturnStatement)stmt;
+            if (_functionDepth == 0)
+                _errors.Add(new SemanticError("'return' outside of function"));
+            if (s.Value != null)
+                AnalyzeExpression(s.Value);
+        }
     }
 
     private void AnalyzeExpression(Expression expr)
@@ -109,6 +154,20 @@ public class Analyzer
         {
             GroupExpression e = (GroupExpression)expr;
             AnalyzeExpression(e.Inner);
+        }
+        else if (expr.GetType() == typeof(CallExpression))
+        {
+            CallExpression e = (CallExpression)expr;
+            if (!_table.IsFunctionDeclared(e.Callee))
+                _errors.Add(new SemanticError("Function '" + e.Callee + "' is called but was never declared"));
+            else
+            {
+                int arity = _table.GetArity(e.Callee);
+                if (arity != e.Arguments.Count)
+                    _errors.Add(new SemanticError("Function '" + e.Callee + "' expects " + arity + " arguments, got " + e.Arguments.Count));
+            }
+            for (int i = 0; i < e.Arguments.Count; i++)
+                AnalyzeExpression(e.Arguments[i]);
         }
     }
 }

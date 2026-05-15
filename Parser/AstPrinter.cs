@@ -83,6 +83,23 @@ public class AstPrinter
             ExpressionStatement s = (ExpressionStatement)stmt;
             PrintExpression(s.Expression, prefix, isLast);
         }
+        else if (stmt.GetType() == typeof(FunctionDeclaration))
+        {
+            FunctionDeclaration s = (FunctionDeclaration)stmt;
+            PrintLine(prefix, isLast, "FunDecl: " + s.Name + "(" + string.Join(", ", s.Parameters) + ")");
+            string next = ChildPrefix(prefix, isLast);
+            PrintStatement(s.Body, next, true);
+        }
+        else if (stmt.GetType() == typeof(ReturnStatement))
+        {
+            ReturnStatement s = (ReturnStatement)stmt;
+            PrintLine(prefix, isLast, "Return");
+            if (s.Value != null)
+            {
+                string next = ChildPrefix(prefix, isLast);
+                PrintExpression(s.Value, next, true);
+            }
+        }
     }
 
     private void PrintExpression(Expression expr, string prefix, bool isLast)
@@ -118,6 +135,14 @@ public class AstPrinter
             PrintLine(prefix, isLast, "Group");
             string next = ChildPrefix(prefix, isLast);
             PrintExpression(e.Inner, next, true);
+        }
+        else if (expr.GetType() == typeof(CallExpression))
+        {
+            CallExpression e = (CallExpression)expr;
+            PrintLine(prefix, isLast, "Call: " + e.Callee);
+            string next = ChildPrefix(prefix, isLast);
+            for (int i = 0; i < e.Arguments.Count; i++)
+                PrintExpression(e.Arguments[i], next, i == e.Arguments.Count - 1);
         }
     }
 }

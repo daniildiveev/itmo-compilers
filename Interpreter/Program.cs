@@ -5,15 +5,16 @@ namespace SimpleInterpreter;
 
 class Program
 {
-    static string sampleCode = @"var x = 11;
-var y = 0;
-while (x > 0) {
-  y = y + x;
-  x = x - 1;
-  print y;
+    static string sampleCode = @"fun add(a, b) {
+  return a + b;
 }
-print y;
-if (y == 66) { print 1; } else { print 0; }";
+fun fact(n) {
+  if (n <= 1) { return 1; }
+  return n * fact(n - 1);
+}
+var s = add(2, 3);
+print s;
+print fact(5);";
 
     static void Main()
     {
