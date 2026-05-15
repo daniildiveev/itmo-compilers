@@ -63,9 +63,37 @@ public class Parser
             return ParseIfStatement();
         if (Match(TokenType.WHILE))
             return ParseWhileStatement();
+        if (Match(TokenType.FUN))
+            return ParseFunctionDeclaration();
+        if (Match(TokenType.RETURN))
+            return ParseReturnStatement();
         if (Match(TokenType.LBRACE))
             return ParseBlock();
         return ParseAssignOrExpressionStatement();
+    }
+    private Statement ParseFunctionDeclaration()
+    {
+        Token name = Consume(TokenType.ID, "Expected function name after 'fun'");
+        Consume(TokenType.LPAREN, "Expected '(' after function name");
+        List<string> parameters = new List<string>();
+        if (!Check(TokenType.RPAREN))
+        {
+            parameters.Add(Consume(TokenType.ID, "Expected parameter name").Value);
+            while (Match(TokenType.COMMA))
+                parameters.Add(Consume(TokenType.ID, "Expected parameter name").Value);
+        }
+        Consume(TokenType.RPAREN, "Expected ')' after parameters");
+        Consume(TokenType.LBRACE, "Expected '{' before function body");
+        BlockStatement body = (BlockStatement)ParseBlock();
+        return new FunctionDeclaration(name.Value, parameters, body);
+    }
+    private Statement ParseReturnStatement()
+    {
+        Expression? value = null;
+        if (!Check(TokenType.SEMICOLON))
+            value = ParseExpression();
+        Consume(TokenType.SEMICOLON, "Expected ';' after return");
+        return new ReturnStatement(value);
     }
     private Statement ParseVarDeclaration()
     {
@@ -165,7 +193,22 @@ public class Parser
         if (Match(TokenType.NUMBER))
             return new NumberExpression(double.Parse(Previous().Value, System.Globalization.CultureInfo.InvariantCulture));
         if (Match(TokenType.ID))
-            return new VariableExpression(Previous().Value);
+        {
+            string name = Previous().Value;
+            if (Match(TokenType.LPAREN))
+            {
+                List<Expression> args = new List<Expression>();
+                if (!Check(TokenType.RPAREN))
+                {
+                    args.Add(ParseExpression());
+                    while (Match(TokenType.COMMA))
+                        args.Add(ParseExpression());
+                }
+                Consume(TokenType.RPAREN, "Expected ')' after arguments");
+                return new CallExpression(name, args);
+            }
+            return new VariableExpression(name);
+        }
         if (Match(TokenType.LPAREN))
         {
             Expression inner = ParseExpression();

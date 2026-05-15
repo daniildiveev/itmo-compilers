@@ -56,9 +56,17 @@ while (current + limit) {
         Console.WriteLine();
     }
 
+    static string funcSample = @"fun add(a, b) { return a + b; }
+fun isPos(n) { return n > 0; }
+var s = add(2, 3);
+print s;
+print isPos(s);
+print add(true, 1);";
+
     static void Main()
     {
         RunPipeline("SAMPLE WITH TYPE ERRORS", errorSample);
         RunPipeline("CLEAN SAMPLE", cleanSample);
+        RunPipeline("FUNCTION SAMPLE", funcSample);
     }
 }

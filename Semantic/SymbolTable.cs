@@ -3,10 +3,12 @@ namespace SimpleSemantic;
 public class SymbolTable
 {
     private List<Dictionary<string, bool>> _scopes;
+    private Dictionary<string, int> _functions;
 
     public SymbolTable()
     {
         _scopes = new List<Dictionary<string, bool>>();
+        _functions = new Dictionary<string, int>();
     }
 
     public void EnterScope()
@@ -37,5 +39,20 @@ public class SymbolTable
                 return true;
         }
         return false;
+    }
+
+    public void DeclareFunction(string name, int arity)
+    {
+        _functions[name] = arity;
+    }
+
+    public bool IsFunctionDeclared(string name)
+    {
+        return _functions.ContainsKey(name);
+    }
+
+    public int GetArity(string name)
+    {
+        return _functions[name];
     }
 }

@@ -10,16 +10,16 @@ var x = 20;
 print y;
 print x / 0;";
 
-    static string cleanSample = @"var limit = 10;
-var current = 0;
-while (current < limit) {
-    if (current == 5) {
-        print current * 100;
-    } else {
-        print current;
-    }
-    current = current + 1;
-}";
+    static string cleanSample = @"fun add(a, b) {
+  return a + b;
+}
+var s = add(2, 3);
+print s;";
+
+    static string funcErrorSample = @"fun add(a, b) { return a + b; }
+print add(1);
+print mul(1, 2);
+return 5;";
 
     static void RunPipeline(string label, string source)
     {
@@ -58,5 +58,6 @@ while (current < limit) {
     {
         RunPipeline("SAMPLE WITH ERRORS", errorSample);
         RunPipeline("CLEAN SAMPLE", cleanSample);
+        RunPipeline("FUNCTION ERRORS", funcErrorSample);
     }
 }

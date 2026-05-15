@@ -4,17 +4,11 @@ namespace SimpleParser;
 
 class Program
 {
-    static string sampleCode = @"  var limit = 10;
-  var current = 0;
-
-  while (current < limit) {
-      if (current == 5) {
-          print current * 100;
-      } else {
-          print current;
-      }
-      current = current + 1;
-  }";
+    static string sampleCode = @"fun add(a, b) {
+  return a + b;
+}
+var s = add(2, 3);
+print s;";
 
     static void Main()
     {
