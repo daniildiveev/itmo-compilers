@@ -191,39 +191,3 @@ public class CallExpression : Expression
         Arguments = arguments;
     }
 }
-
-public class ArrayLiteralExpression : Expression
-{
-    public List<Expression> Elements { get; }
-
-    public ArrayLiteralExpression(List<Expression> elements)
-    {
-        Elements = elements;
-    }
-}
-
-public class ArrayIndexExpression : Expression
-{
-    public Expression Array { get; }
-    public Expression Index { get; }
-
-    public ArrayIndexExpression(Expression array, Expression index)
-    {
-        Array = array;
-        Index = index;
-    }
-}
-
-public class IndexAssignStatement : Statement
-{
-    public Expression Array { get; }
-    public Expression Index { get; }
-    public Expression Value { get; }
-
-    public IndexAssignStatement(Expression array, Expression index, Expression value)
-    {
-        Array = array;
-        Index = index;
-        Value = value;
-    }
-}

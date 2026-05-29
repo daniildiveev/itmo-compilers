@@ -48,28 +48,6 @@ print add(1);
 print mul(1, 2);
 return 5;";
 
-    static string arraySample = @"var a = [1, 2, 3];
-print a;
-print a[0];
-a[1] = 42;
-print a;
-print length(a);
-var sum = 0;
-var i = 0;
-while (i < length(a)) {
-  sum = sum + a[i];
-  i = i + 1;
-}
-print sum;";
-
-    static string arrayOobSample = @"var a = [1, 2];
-print a[5];";
-
-    static string arrayTypeErrorSample = @"var a = [1, 2 > 1];
-print a;";
-
-    static string arrayFoldSample = @"print [1 + 1, 2 * 3][0];";
-
     static void RunPipeline(string label, string source)
     {
         Console.WriteLine("=== " + label + " ===");
@@ -135,9 +113,5 @@ print a;";
         RunPipeline("OPTIMIZATION (fold + dead code)", optimizationSample);
         RunPipeline("DIVISION BY ZERO (not folded)", divByZeroSample);
         RunPipeline("ERROR CASES", errorSample);
-        RunPipeline("ARRAYS (build/index/mutate/length/loop)", arraySample);
-        RunPipeline("ARRAY OUT OF BOUNDS", arrayOobSample);
-        RunPipeline("ARRAY TYPE MISMATCH", arrayTypeErrorSample);
-        RunPipeline("ARRAY CONST FOLD", arrayFoldSample);
     }
 }

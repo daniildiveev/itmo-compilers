@@ -100,15 +100,6 @@ public class AstPrinter
                 PrintExpression(s.Value, next, true);
             }
         }
-        else if (stmt.GetType() == typeof(IndexAssignStatement))
-        {
-            IndexAssignStatement s = (IndexAssignStatement)stmt;
-            PrintLine(prefix, isLast, "IndexAssign");
-            string next = ChildPrefix(prefix, isLast);
-            PrintExpression(s.Array, next, false);
-            PrintExpression(s.Index, next, false);
-            PrintExpression(s.Value, next, true);
-        }
     }
 
     private void PrintExpression(Expression expr, string prefix, bool isLast)
@@ -157,22 +148,6 @@ public class AstPrinter
             string next = ChildPrefix(prefix, isLast);
             for (int i = 0; i < e.Arguments.Count; i++)
                 PrintExpression(e.Arguments[i], next, i == e.Arguments.Count - 1);
-        }
-        else if (expr.GetType() == typeof(ArrayLiteralExpression))
-        {
-            ArrayLiteralExpression e = (ArrayLiteralExpression)expr;
-            PrintLine(prefix, isLast, "Array");
-            string next = ChildPrefix(prefix, isLast);
-            for (int i = 0; i < e.Elements.Count; i++)
-                PrintExpression(e.Elements[i], next, i == e.Elements.Count - 1);
-        }
-        else if (expr.GetType() == typeof(ArrayIndexExpression))
-        {
-            ArrayIndexExpression e = (ArrayIndexExpression)expr;
-            PrintLine(prefix, isLast, "Index");
-            string next = ChildPrefix(prefix, isLast);
-            PrintExpression(e.Array, next, false);
-            PrintExpression(e.Index, next, true);
         }
     }
 }

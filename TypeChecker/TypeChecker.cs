@@ -132,18 +132,6 @@ public class TypeChecker
             else if (t != SimpleType.Unknown && t != _currentReturnType)
                 _errors.Add(new TypeError("Inconsistent return types: " + _currentReturnType + " and " + t));
         }
-        else if (stmt.GetType() == typeof(IndexAssignStatement))
-        {
-            IndexAssignStatement s = (IndexAssignStatement)stmt;
-            SimpleType arrType = InferExpression(s.Array);
-            SimpleType idxType = InferExpression(s.Index);
-            SimpleType valType = InferExpression(s.Value);
-            if (idxType != SimpleType.Number && idxType != SimpleType.Unknown)
-                _errors.Add(new TypeError("Array index must be Number, got " + idxType));
-            SimpleType elem = ArrayTypes.ElementType(arrType);
-            if (ArrayTypes.IsArray(arrType) && elem != SimpleType.Unknown && valType != SimpleType.Unknown && valType != elem)
-                _errors.Add(new TypeError("Cannot assign " + valType + " to element of " + arrType));
-        }
     }
 
     private SimpleType InferExpression(Expression expr)
@@ -225,46 +213,12 @@ public class TypeChecker
             GroupExpression e = (GroupExpression)expr;
             return InferExpression(e.Inner);
         }
-        else if (expr.GetType() == typeof(ArrayLiteralExpression))
-        {
-            ArrayLiteralExpression e = (ArrayLiteralExpression)expr;
-            if (e.Elements.Count == 0)
-                return SimpleType.UnknownArray;
-            SimpleType elem = SimpleType.Unknown;
-            for (int i = 0; i < e.Elements.Count; i++)
-            {
-                SimpleType t = InferExpression(e.Elements[i]);
-                if (t == SimpleType.Unknown) continue;
-                if (elem == SimpleType.Unknown)
-                    elem = t;
-                else if (t != elem)
-                    _errors.Add(new TypeError("Array elements must have the same type, got " + elem + " and " + t));
-            }
-            return ArrayTypes.ArrayOf(elem);
-        }
-        else if (expr.GetType() == typeof(ArrayIndexExpression))
-        {
-            ArrayIndexExpression e = (ArrayIndexExpression)expr;
-            SimpleType arrType = InferExpression(e.Array);
-            SimpleType idxType = InferExpression(e.Index);
-            if (!ArrayTypes.IsArray(arrType) && arrType != SimpleType.Unknown)
-                _errors.Add(new TypeError("Cannot index non-array type " + arrType));
-            if (idxType != SimpleType.Number && idxType != SimpleType.Unknown)
-                _errors.Add(new TypeError("Array index must be Number, got " + idxType));
-            return ArrayTypes.ElementType(arrType);
-        }
         else if (expr.GetType() == typeof(CallExpression))
         {
             CallExpression e = (CallExpression)expr;
             List<SimpleType> argTypes = new List<SimpleType>();
             for (int i = 0; i < e.Arguments.Count; i++)
                 argTypes.Add(InferExpression(e.Arguments[i]));
-            if (e.Callee == "length" && !_functions.ContainsKey("length"))
-            {
-                if (argTypes.Count == 1 && !ArrayTypes.IsArray(argTypes[0]) && argTypes[0] != SimpleType.Unknown)
-                    _errors.Add(new TypeError("length expects an array, got " + argTypes[0]));
-                return SimpleType.Number;
-            }
             if (!_functions.ContainsKey(e.Callee))
                 return SimpleType.Unknown;
             FunctionSignature sig = _functions[e.Callee];
