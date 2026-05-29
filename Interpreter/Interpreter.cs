@@ -62,7 +62,7 @@ public class Interpreter
         {
             PrintStatement ps = (PrintStatement)stmt;
             object value = Eval(ps.Expression);
-            Console.WriteLine(Stringify(value));
+            Console.WriteLine(value);
             return;
         }
         if (stmt.GetType() == typeof(BlockStatement))
@@ -141,19 +141,6 @@ public class Interpreter
             if (rs.Value != null)
                 value = Eval(rs.Value);
             throw new ReturnException(value);
-        }
-        if (stmt.GetType() == typeof(IndexAssignStatement))
-        {
-            IndexAssignStatement ias = (IndexAssignStatement)stmt;
-            object arrObj = Eval(ias.Array);
-            object idxObj = Eval(ias.Index);
-            object value = Eval(ias.Value);
-            List<object> list = AsArray(arrObj);
-            int idx = AsIndex(idxObj);
-            if (idx < 0 || idx >= list.Count)
-                throw new Exception("[Runtime Error] Array index " + idx + " out of bounds (length " + list.Count + ")");
-            list[idx] = value;
-            return;
         }
         throw new Exception("[Runtime Error] Unknown statement type");
     }
@@ -325,36 +312,9 @@ public class Interpreter
             }
             throw new Exception("[Runtime Error] Unknown binary operator");
         }
-        if (expr.GetType() == typeof(ArrayLiteralExpression))
-        {
-            ArrayLiteralExpression ale = (ArrayLiteralExpression)expr;
-            List<object> list = new List<object>();
-            for (int i = 0; i < ale.Elements.Count; i++)
-                list.Add(Eval(ale.Elements[i]));
-            return list;
-        }
-        if (expr.GetType() == typeof(ArrayIndexExpression))
-        {
-            ArrayIndexExpression aie = (ArrayIndexExpression)expr;
-            object arrObj = Eval(aie.Array);
-            object idxObj = Eval(aie.Index);
-            List<object> list = AsArray(arrObj);
-            int idx = AsIndex(idxObj);
-            if (idx < 0 || idx >= list.Count)
-                throw new Exception("[Runtime Error] Array index " + idx + " out of bounds (length " + list.Count + ")");
-            return list[idx];
-        }
         if (expr.GetType() == typeof(CallExpression))
         {
             CallExpression ce = (CallExpression)expr;
-            if (ce.Callee == "length" && !_functions.ContainsKey("length"))
-            {
-                if (ce.Arguments.Count != 1)
-                    throw new Exception("[Runtime Error] Function 'length' expects 1 arguments, got " + ce.Arguments.Count);
-                object arrObj = Eval(ce.Arguments[0]);
-                List<object> list = AsArray(arrObj);
-                return (double)list.Count;
-            }
             if (!_functions.ContainsKey(ce.Callee))
                 throw new Exception("[Runtime Error] Undefined function '" + ce.Callee + "'");
             FunctionValue fn = _functions[ce.Callee];
@@ -385,29 +345,5 @@ public class Interpreter
             return result;
         }
         throw new Exception("[Runtime Error] Unknown expression type");
-    }
-
-    private List<object> AsArray(object o)
-    {
-        if (o is List<object> list) return list;
-        throw new Exception("[Runtime Error] Type mismatch: expected array");
-    }
-
-    private int AsIndex(object o)
-    {
-        if (o is double d) return (int)d;
-        throw new Exception("[Runtime Error] Type mismatch: expected number index");
-    }
-
-    private string Stringify(object value)
-    {
-        if (value is List<object> list)
-        {
-            List<string> parts = new List<string>();
-            for (int i = 0; i < list.Count; i++)
-                parts.Add(Stringify(list[i]));
-            return "[" + string.Join(", ", parts) + "]";
-        }
-        return value.ToString();
     }
 }

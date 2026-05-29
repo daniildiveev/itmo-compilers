@@ -120,13 +120,6 @@ public class Analyzer
             if (s.Value != null)
                 AnalyzeExpression(s.Value);
         }
-        else if (stmt.GetType() == typeof(IndexAssignStatement))
-        {
-            IndexAssignStatement s = (IndexAssignStatement)stmt;
-            AnalyzeExpression(s.Array);
-            AnalyzeExpression(s.Index);
-            AnalyzeExpression(s.Value);
-        }
     }
 
     private void AnalyzeExpression(Expression expr)
@@ -168,12 +161,7 @@ public class Analyzer
         else if (expr.GetType() == typeof(CallExpression))
         {
             CallExpression e = (CallExpression)expr;
-            if (e.Callee == "length" && !_table.IsFunctionDeclared("length"))
-            {
-                if (e.Arguments.Count != 1)
-                    _errors.Add(new SemanticError("Function 'length' expects 1 arguments, got " + e.Arguments.Count));
-            }
-            else if (!_table.IsFunctionDeclared(e.Callee))
+            if (!_table.IsFunctionDeclared(e.Callee))
                 _errors.Add(new SemanticError("Function '" + e.Callee + "' is called but was never declared"));
             else
             {
@@ -183,18 +171,6 @@ public class Analyzer
             }
             for (int i = 0; i < e.Arguments.Count; i++)
                 AnalyzeExpression(e.Arguments[i]);
-        }
-        else if (expr.GetType() == typeof(ArrayLiteralExpression))
-        {
-            ArrayLiteralExpression e = (ArrayLiteralExpression)expr;
-            for (int i = 0; i < e.Elements.Count; i++)
-                AnalyzeExpression(e.Elements[i]);
-        }
-        else if (expr.GetType() == typeof(ArrayIndexExpression))
-        {
-            ArrayIndexExpression e = (ArrayIndexExpression)expr;
-            AnalyzeExpression(e.Array);
-            AnalyzeExpression(e.Index);
         }
     }
 }
