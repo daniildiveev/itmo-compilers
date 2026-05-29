@@ -20,7 +20,7 @@ public class Lexer
         { "&&", TokenType.AND }, { "||", TokenType.OR }, { "+", TokenType.PLUS }, { "-", TokenType.MINUS },
         { "*", TokenType.STAR }, { "/", TokenType.SLASH }, { "=", TokenType.EQ }, { "<", TokenType.LT },
         { ">", TokenType.GT }, { "!", TokenType.EXCL }, { "(", TokenType.LPAREN }, { ")", TokenType.RPAREN },
-        { "{", TokenType.LBRACE }, { "}", TokenType.RBRACE }, { ",", TokenType.COMMA }, { ";", TokenType.SEMICOLON }
+        { "{", TokenType.LBRACE }, { "}", TokenType.RBRACE }, { "[", TokenType.LBRACKET }, { "]", TokenType.RBRACKET }, { ",", TokenType.COMMA }, { ";", TokenType.SEMICOLON }
     };
 
     public Lexer(string input)

@@ -114,6 +114,11 @@ public class Optimizer
             }
             return new WhileStatement(cond, OptStmt(s.Body));
         }
+        if (stmt.GetType() == typeof(IndexAssignStatement))
+        {
+            IndexAssignStatement s = (IndexAssignStatement)stmt;
+            return new IndexAssignStatement(OptExpr(s.Array), OptExpr(s.Index), OptExpr(s.Value));
+        }
         return stmt;
     }
 
@@ -180,6 +185,19 @@ public class Optimizer
                 return simplified;
             }
             return cur;
+        }
+        if (expr.GetType() == typeof(ArrayLiteralExpression))
+        {
+            ArrayLiteralExpression a = (ArrayLiteralExpression)expr;
+            List<Expression> elements = new List<Expression>();
+            for (int i = 0; i < a.Elements.Count; i++)
+                elements.Add(OptExpr(a.Elements[i]));
+            return new ArrayLiteralExpression(elements);
+        }
+        if (expr.GetType() == typeof(ArrayIndexExpression))
+        {
+            ArrayIndexExpression a = (ArrayIndexExpression)expr;
+            return new ArrayIndexExpression(OptExpr(a.Array), OptExpr(a.Index));
         }
         return expr;
     }
@@ -281,6 +299,18 @@ public class Optimizer
         }
         if (expr.GetType() == typeof(UnaryExpression)) return IsPure(((UnaryExpression)expr).Operand);
         if (expr.GetType() == typeof(GroupExpression)) return IsPure(((GroupExpression)expr).Inner);
+        if (expr.GetType() == typeof(ArrayIndexExpression))
+        {
+            ArrayIndexExpression e = (ArrayIndexExpression)expr;
+            return IsPure(e.Array) && IsPure(e.Index);
+        }
+        if (expr.GetType() == typeof(ArrayLiteralExpression))
+        {
+            ArrayLiteralExpression e = (ArrayLiteralExpression)expr;
+            for (int i = 0; i < e.Elements.Count; i++)
+                if (!IsPure(e.Elements[i])) return false;
+            return true;
+        }
         return true;
     }
 

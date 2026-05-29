@@ -12,6 +12,7 @@ public enum TokenType
     AND, OR,
     LPAREN, RPAREN,
     LBRACE, RBRACE,
+    LBRACKET, RBRACKET,
     COMMA, SEMICOLON,
     EOF
 }

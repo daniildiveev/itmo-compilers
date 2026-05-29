@@ -147,6 +147,13 @@ public class Parser
             return new AssignStatement(name.Value, value);
         }
         Expression expr = ParseExpression();
+        if (expr.GetType() == typeof(ArrayIndexExpression) && Match(TokenType.EQ))
+        {
+            ArrayIndexExpression target = (ArrayIndexExpression)expr;
+            Expression value = ParseExpression();
+            Consume(TokenType.SEMICOLON, "Expected ';' after assignment");
+            return new IndexAssignStatement(target.Array, target.Index, value);
+        }
         Consume(TokenType.SEMICOLON, "Expected ';' after expression");
         return new ExpressionStatement(expr);
     }
@@ -190,8 +197,31 @@ public class Parser
     }
     private Expression ParsePrimary()
     {
+        Expression expr = ParsePrimaryBase();
+        while (Match(TokenType.LBRACKET))
+        {
+            Expression index = ParseExpression();
+            Consume(TokenType.RBRACKET, "Expected ']' after index");
+            expr = new ArrayIndexExpression(expr, index);
+        }
+        return expr;
+    }
+    private Expression ParsePrimaryBase()
+    {
         if (Match(TokenType.NUMBER))
             return new NumberExpression(double.Parse(Previous().Value, System.Globalization.CultureInfo.InvariantCulture));
+        if (Match(TokenType.LBRACKET))
+        {
+            List<Expression> elements = new List<Expression>();
+            if (!Check(TokenType.RBRACKET))
+            {
+                elements.Add(ParseExpression());
+                while (Match(TokenType.COMMA))
+                    elements.Add(ParseExpression());
+            }
+            Consume(TokenType.RBRACKET, "Expected ']' after array elements");
+            return new ArrayLiteralExpression(elements);
+        }
         if (Match(TokenType.ID))
         {
             string name = Previous().Value;
