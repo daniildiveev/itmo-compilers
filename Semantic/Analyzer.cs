@@ -127,6 +127,9 @@ public class Analyzer
         if (expr.GetType() == typeof(NumberExpression))
         {
         }
+        else if (expr.GetType() == typeof(BooleanExpression))
+        {
+        }
         else if (expr.GetType() == typeof(VariableExpression))
         {
             VariableExpression e = (VariableExpression)expr;

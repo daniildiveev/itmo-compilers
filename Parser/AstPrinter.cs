@@ -109,6 +109,11 @@ public class AstPrinter
             NumberExpression e = (NumberExpression)expr;
             PrintLine(prefix, isLast, "Number: " + e.Value);
         }
+        else if (expr.GetType() == typeof(BooleanExpression))
+        {
+            BooleanExpression e = (BooleanExpression)expr;
+            PrintLine(prefix, isLast, "Bool: " + (e.Value ? "true" : "false"));
+        }
         else if (expr.GetType() == typeof(VariableExpression))
         {
             VariableExpression e = (VariableExpression)expr;

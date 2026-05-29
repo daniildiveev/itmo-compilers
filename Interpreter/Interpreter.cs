@@ -152,6 +152,11 @@ public class Interpreter
             NumberExpression ne = (NumberExpression)expr;
             return ne.Value;
         }
+        if (expr.GetType() == typeof(BooleanExpression))
+        {
+            BooleanExpression boolExpr = (BooleanExpression)expr;
+            return boolExpr.Value;
+        }
         if (expr.GetType() == typeof(VariableExpression))
         {
             VariableExpression ve = (VariableExpression)expr;

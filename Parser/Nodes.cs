@@ -20,6 +20,16 @@ public class NumberExpression : Expression
     }
 }
 
+public class BooleanExpression : Expression
+{
+    public bool Value { get; }
+
+    public BooleanExpression(bool value)
+    {
+        Value = value;
+    }
+}
+
 public class VariableExpression : Expression
 {
     public string Name { get; }
