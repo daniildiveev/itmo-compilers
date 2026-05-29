@@ -4,14 +4,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>SimpleFunctions</RootNamespace>
+    <RootNamespace>SimpleOptimizer</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Lexer/Lexer.csproj" />
     <ProjectReference Include="../Parser/Parser.csproj" />
-    <ProjectReference Include="../Semantic/Semantic.csproj" />
-    <ProjectReference Include="../TypeChecker/TypeChecker.csproj" />
-    <ProjectReference Include="../Interpreter/Interpreter.csproj" />
-    <ProjectReference Include="../Optimizer/Optimizer.csproj" />
   </ItemGroup>
 </Project>

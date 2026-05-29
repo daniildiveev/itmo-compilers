@@ -140,6 +140,10 @@ public class TypeChecker
         {
             return SimpleType.Number;
         }
+        else if (expr.GetType() == typeof(BooleanExpression))
+        {
+            return SimpleType.Bool;
+        }
         else if (expr.GetType() == typeof(VariableExpression))
         {
             VariableExpression e = (VariableExpression)expr;

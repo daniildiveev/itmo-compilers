@@ -2,6 +2,7 @@ using SimpleLexer;
 using SimpleParser;
 using SimpleSemantic;
 using SimpleTypeChecker;
+using SimpleOptimizer;
 
 namespace SimpleFunctions;
 
@@ -34,6 +35,13 @@ fun isOdd(n) {
 }
 print isEven(4);
 print isEven(7);";
+
+    static string optimizationSample = @"var x = 2 + 3 * 4;
+if (x > 1) { print x; } else { print 0; }
+while (1 > 2) { print 99; }
+print x * 1 + 0;";
+
+    static string divByZeroSample = @"print 1 / (2 - 2);";
 
     static string errorSample = @"fun add(a, b) { return a + b; }
 print add(1);
@@ -79,9 +87,15 @@ return 5;";
 
             if (semErrors.Count == 0 && typeErrors.Count == 0)
             {
+                Optimizer optimizer = new Optimizer();
+                List<Statement> optimized = optimizer.Optimize(statements);
+
+                Console.WriteLine("--- OPTIMIZED AST ---");
+                printer.Print(optimized);
+
                 Console.WriteLine("--- OUTPUT ---");
                 SimpleInterpreter.Interpreter interp = new SimpleInterpreter.Interpreter();
-                interp.Interpret(statements);
+                interp.Interpret(optimized);
             }
         }
         catch (Exception ex)
@@ -96,6 +110,8 @@ return 5;";
         RunPipeline("FACTORIAL (recursion)", factorialSample);
         RunPipeline("ADD + SQUARE (nested call)", addSample);
         RunPipeline("MUTUAL RECURSION", mutualSample);
+        RunPipeline("OPTIMIZATION (fold + dead code)", optimizationSample);
+        RunPipeline("DIVISION BY ZERO (not folded)", divByZeroSample);
         RunPipeline("ERROR CASES", errorSample);
     }
 }
