@@ -4,7 +4,32 @@ public enum SimpleType
 {
     Number,
     Bool,
-    Unknown
+    Unknown,
+    NumberArray,
+    BoolArray,
+    UnknownArray
+}
+
+public static class ArrayTypes
+{
+    public static bool IsArray(SimpleType t)
+    {
+        return t == SimpleType.NumberArray || t == SimpleType.BoolArray || t == SimpleType.UnknownArray;
+    }
+
+    public static SimpleType ElementType(SimpleType arrayType)
+    {
+        if (arrayType == SimpleType.NumberArray) return SimpleType.Number;
+        if (arrayType == SimpleType.BoolArray) return SimpleType.Bool;
+        return SimpleType.Unknown;
+    }
+
+    public static SimpleType ArrayOf(SimpleType elemType)
+    {
+        if (elemType == SimpleType.Number) return SimpleType.NumberArray;
+        if (elemType == SimpleType.Bool) return SimpleType.BoolArray;
+        return SimpleType.UnknownArray;
+    }
 }
 
 public class FunctionSignature
